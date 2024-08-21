@@ -1,5 +1,5 @@
-import axios from 'axios';
 import React, { useState, useEffect } from 'react';
+import Source from './Source/Source';
 
 function App() {
   const [persons, setPersons] = useState([]);
@@ -10,10 +10,11 @@ function App() {
   const [hasSearched, setHasSearched] = useState(false);
 
   useEffect(() => {
-    axios.get("http://localhost:3001/persons")
-      .then((response) => {
-        setPersons(response.data);
-        console.log(response.data);
+    Source
+    .getData()
+      .then((data) => {
+        setPersons(data);
+        console.log(data);
       })
       .catch(error => {
         console.error("Error fetching data:", error);
@@ -35,34 +36,41 @@ function App() {
   const handleOnSubmit = (e) => {
     e.preventDefault();
     if (newName.trim() !== "" && newNumber.trim() !== "") {
-      const isDuplicateName = persons.some(
-        (person) => person.name.toLowerCase() === newName.trim().toLowerCase()
-      );
-      const isDuplicateNumber = persons.some(
-        (person) => person.number === newNumber.trim()
-      );
+        const existingPerson = persons.find(
+            (person) => person.name.toLowerCase() === newName.trim().toLowerCase()
+        );
 
-      if (isDuplicateName || isDuplicateNumber) {
-        if (isDuplicateName) {
-          alert(`The name "${newName}" already exists!`);
+        if (existingPerson) {
+            if (window.confirm(`The name "${newName}" already exists. Do you want to update the number?`)) {
+                const updatedPerson = { ...existingPerson, number: newNumber.trim() };
+                Source.replaceData(existingPerson.id, updatedPerson)
+                    .then((data) => {
+                        setPersons(persons.map(person =>
+                            person.id === existingPerson.id ? data : person
+                        ));
+                        setNewName("");
+                        setNewNumber("");
+                    })
+                    .catch(error => {
+                        console.error("Error updating person:", error);
+                    });
+            }
+        } else {
+            const newPerson = { name: newName.trim(), number: newNumber.trim() };
+            Source.postData(newPerson)
+                .then((data) => {
+                    setPersons(persons.concat(data));
+                    setNewName("");
+                    setNewNumber("");
+                })
+                .catch(error => {
+                    console.error("Error adding person:", error);
+                });
         }
-        if (isDuplicateNumber) {
-          alert(`The number "${newNumber}" already exists!`);
-        }
-      } else {
-        const newPerson = { name: newName.trim(), number: newNumber.trim() };
-        axios.post("http://localhost:3001/persons", newPerson)
-          .then((response) => {
-            setPersons(persons.concat(response.data));
-            setNewName("");
-            setNewNumber("");
-          })
-          .catch(error => {
-            console.error("Error adding person:", error);
-          });
-      }
     }
-  };
+};
+
+
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -72,6 +80,20 @@ function App() {
     );
     setSearchResult(results);
   };
+ 
+   const handleDelete = (id)=>{
+        window.confirm("do u really want to delete?")
+        Source
+        .deleteData(id)
+        .then(()=>{
+          const updated =  persons.filter(item => item.id !== id)
+          setPersons(updated);
+        })
+        .catch((error)=>{
+              console.error("Error deleting data:", error);     
+        })
+        
+   }
 
   return (
     <>
@@ -117,7 +139,7 @@ function App() {
         <ul>
           {persons.map((p, i) => (
             <li key={i}>
-              Name: {p.name} Numbers: {p.number}
+              Name: {p.name} Numbers: {p.number} <button onClick={()=>{handleDelete(p.id)}}>Delete</button>
             </li>
           ))}
         </ul>

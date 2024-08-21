@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import Note from './component/Note/Note'
+import Services from './Services/Services';
 import axios, { Axios } from 'axios';
 
 function App() {
@@ -9,13 +10,15 @@ function App() {
   const [show, setShow] = useState(true)
   // requesting data 
    useEffect(()=>{
-    console.log("effect");
-    
-    axios.get('http://localhost:3001/notes').then((response)=>{
+    Services
+    .getAll()
+    .then((response)=>{
       setNotes(response.data)
-    }).catch(error => {
-      console.error("There was an error fetching the notes!", error);
-    });
+    })
+    .catch((Error)=>{
+      console.log(`${Error} Problem in dta fetching`);
+      
+    })
    },[])
 
 
@@ -28,10 +31,13 @@ function App() {
       important: Math.random() < 0.5,
     }
 //  Pushed data to data base
-   axios.post('http://localhost:3001/notes', noteobject).then((response)=>{
-    setNotes(notes.concat(response.data))
-    setNewNote("")
-   }) .catch(error => {
+   Services
+   create(noteobject)
+   .then((response)=>{
+       setNotes(notes.concat(response.data))
+       setNewNote("")
+   })
+    .catch(error => {
     console.error("There was an error adding the note!", error);
   });
 
@@ -46,6 +52,11 @@ function App() {
       const url = `http://localhost:3001/notes/${id}`
       const note = note.find(n=>n.id ===id)
       const changeNote= {...note, important: !note.important}
+      Services
+      .update(id, changeNote)
+      .then((response)=>{
+          setNotes(notes.map(note.id !== id ? note : response.data))
+      })
       axios.put(url, changeNote).then(response=>{
         setNotes(notes.map(n=>n.id !== id ? n : response.data))
       })
@@ -55,7 +66,7 @@ function App() {
         <div>
             <h1>Notes</h1>
             <div>
-               <button onClick={()=> {
+               <button className='note' onClick={()=> {
                 setShow(!show)
                }}>
                   show {show ? "important" : 'all'}
