@@ -1,26 +1,6 @@
 {
   "persons": [
     {
-      "name": "Dan Abramov",
-      "number": "12-43-234345",
-      "id": "3"
-    },
-    {
-      "id": "7d24",
-      "name": "wddqas1",
-      "number": "23131"
-    },
-    {
-      "id": "cf6c",
-      "name": "sdnfhsldkfj",
-      "number": "234234"
-    },
-    {
-      "id": "7e22",
-      "name": "Karim",
-      "number": "347593048534"
-    },
-    {
       "id": "f0ff",
       "name": "hasjdadas",
       "number": "213131"
@@ -29,11 +9,6 @@
       "id": "b27c",
       "name": "hasjdadas",
       "number": "213131"
-    },
-    {
-      "id": "7907",
-      "name": "asdbjkds2y",
-      "number": "2342342"
     },
     {
       "id": "91a4",
@@ -54,6 +29,11 @@
       "id": "e4a3",
       "name": "Ali chand",
       "number": "01234"
+    },
+    {
+      "id": "fb54",
+      "name": "khan",
+      "number": "8709808"
     }
   ]
 }
